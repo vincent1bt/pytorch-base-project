@@ -1,0 +1,6 @@
+*.ipynb
+/imagenette2-320
+/imagenette2-320.tgz
+wandb_options.py
+.DS_Store
+__pycache__/

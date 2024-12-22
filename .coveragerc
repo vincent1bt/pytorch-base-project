@@ -1,0 +1,11 @@
+[run]
+omit =
+    test/*
+    */__pycache__/*
+    /private/var/folders/*
+
+[report]
+omit =
+    test/*
+   */__pycache__/*
+   /private/var/folders/*

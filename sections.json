@@ -1,0 +1,15 @@
+{
+    "sections": {
+        "Blocks": "model/blocks",
+        "Model": "model/model",
+        "Train": "train",
+        "TrainUtils": "utils/train",
+        "ManageUtils": "utils/manage",
+        "HyperParameters": "hparameters",
+        "DataLoader": "data/loader",
+        "TestBlocks": "test/test_blocks",
+        "TestModel": "test/test_model",
+        "TestDataLoader": "test/test_data_loader",
+        "TestTrain": "test/test_train"
+    }
+}
