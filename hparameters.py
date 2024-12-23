@@ -41,6 +41,6 @@ class train_config():
 class model_config():
   DROPOUT: float = 0.2
   NUM_LAYERS: int = 5
-  INITIAL_CHANNELS: int = 16
+  INITIAL_CHANNELS: int = 32
   FEAT_SIZE: int = data_config.IMAGE_WIDTH
 

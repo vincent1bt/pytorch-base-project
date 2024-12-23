@@ -60,7 +60,7 @@ val_labels = val_set["noisy_labels_0"].values
 train_dataset = ImageDataset(
     image_paths=train_img_paths,
     image_labels=train_labels,
-    folder_path=data_config.FOLDER_PATH,
+    folder_path=data_config.TRAIN_FOLDER_PATH,
     transforms=train_transforms,
 )
 
@@ -68,15 +68,15 @@ train_loader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=train_config.BATCH_SIZE,
     shuffle=True,
+    drop_last=True,
     num_workers=num_workers,
     pin_memory=True,
-    drop_last=True,
 )
 
 val_dataset = ImageDataset(
     image_paths=val_img_paths,
     image_labels=val_labels,
-    folder_path=data_config.FOLDER_PATH,
+    folder_path=data_config.TRAIN_FOLDER_PATH,
     transforms=val_transforms,
 )
 
@@ -145,7 +145,7 @@ if opts.continue_training:
 
 train_config.PYTORCH_VERSION = torch.__version__
 
-if device:
+if device and device == 'cuda':
     train_config.GPU = torch.cuda.get_device_name(device)
 
 config = {

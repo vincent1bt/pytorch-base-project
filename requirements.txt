@@ -1,0 +1,4 @@
+torch==2.5.1
+torchmetrics==1.6.0
+torchvision==0.20.1
+pandas==1.5.3

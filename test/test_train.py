@@ -30,12 +30,14 @@ class TrainTest(TestCase):
         cls.batch_size = 10
         cls.folder_path = data_config.TRAIN_FOLDER_PATH
 
-        if torch.cuda.is_available():
-           cls.device = 'cuda'
-        elif torch.backends.mps.is_available():
-           cls.device = 'mps'
-        else:
-           cls.device = 'cpu'
+        # if torch.cuda.is_available():
+        #    cls.device = 'cuda'
+        # elif torch.backends.mps.is_available():
+        #    cls.device = 'mps'
+        # else:
+        #    cls.device = 'cpu'
+
+        cls.device = 'cpu'
 
         logger.info(f' Using device: {cls.device}')
 
@@ -91,8 +93,8 @@ class TrainTest(TestCase):
         )
 
         cls.targets = torch.rand(
-            small_batch_size
-        )
+            small_batch_size,
+        ).long()
 
     def test_step_trainer(self):
       inputs, targets = self.inputs.to(self.device), self.targets.to(self.device)
@@ -105,7 +107,6 @@ class TrainTest(TestCase):
       rec, acc, prec = self.epoch_trainer.train(
         epoch=0,
         epochs=2,
-        display=False
       )
 
       self.assertIsInstance(rec, float)

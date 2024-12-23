@@ -4,3 +4,5 @@
 wandb_options.py
 .DS_Store
 __pycache__/
+training_checkpoints/
+.vscode/
