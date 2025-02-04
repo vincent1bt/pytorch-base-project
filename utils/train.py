@@ -144,7 +144,7 @@ class TestManager():
       prec,
     ):
     print(
-      '| Val Recall:', f"{rec:.5f}",
+      'Val Recall:', f"{rec:.5f}",
       '| Val Precision:', f"{prec:.5f}",
       '| Val Accuracy:', f"{acc:.5f}",
     )

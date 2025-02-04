@@ -6,3 +6,6 @@ wandb_options.py
 __pycache__/
 training_checkpoints/
 .vscode/
+pt_model.pt
+results.csv
+train_profile.py

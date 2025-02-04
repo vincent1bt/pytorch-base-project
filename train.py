@@ -24,7 +24,7 @@ using_notebook = getattr(builtins, "__IPYTHON__", False)
 opts = parser.parse_args([]) if using_notebook else parser.parse_args()
 run_id = opts.wandb_id
 
-num_workers = 4
+num_workers = 2
 
 try:
   import wandb
@@ -51,11 +51,9 @@ val_set = df[df["is_valid"] == True]
 
 train_img_paths = train_set["path"].values
 train_labels = train_set[data_config.NOISE_LEVEL].values
-# train_labels = [label_mapping[label] for label in train_labels]
 
 val_img_paths = val_set["path"].values
 val_labels = val_set["noisy_labels_0"].values
-# val_labels = [label_mapping[label] for label in val_labels]
 
 train_dataset = ImageDataset(
     image_paths=train_img_paths,
@@ -69,8 +67,8 @@ train_loader = torch.utils.data.DataLoader(
     batch_size=train_config.BATCH_SIZE,
     shuffle=True,
     drop_last=True,
-    num_workers=num_workers,
-    pin_memory=True,
+    # num_workers=num_workers,
+    # pin_memory=True,
 )
 
 val_dataset = ImageDataset(
@@ -84,8 +82,8 @@ val_loader = torch.utils.data.DataLoader(
     val_dataset,
     batch_size=train_config.BATCH_SIZE,
     shuffle=False,
-    num_workers=num_workers,
-    pin_memory=True,
+    # num_workers=num_workers,
+    # pin_memory=True,
 )
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -173,7 +171,7 @@ for epoch in range(opts.start_epoch, epochs):
       epoch
     )
 
+run.finish()
+
 torch.save(model.state_dict(), "model.pth")
 print("Model saved successfully!")
-
-run.finish()

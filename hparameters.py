@@ -17,7 +17,7 @@ labels = {
 
 @dataclass
 class data_config():
-  IMAGE_WIDTH: int = 224
+  IMAGE_WIDTH: int = 224 # 256 for next training
   IMAGE_HEIGHT: int = 224
   IMAGE_CHANNELS: int = 3
   NUM_CLASSES: int = 10
@@ -28,7 +28,7 @@ class data_config():
 
 @dataclass
 class train_config():
-  BATCH_SIZE: int = 64
+  BATCH_SIZE: int = 8
   LEARNING_RATE: float = 1.5e-3
   SHUFFLE: bool = True
   BETA1: float = 0.9
@@ -41,6 +41,6 @@ class train_config():
 class model_config():
   DROPOUT: float = 0.2
   NUM_LAYERS: int = 5
-  INITIAL_CHANNELS: int = 32
+  INITIAL_CHANNELS: int = 16
   FEAT_SIZE: int = data_config.IMAGE_WIDTH
 

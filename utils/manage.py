@@ -66,13 +66,14 @@ class DebugMetricsManager(MetricsManager):
   def update_metrics(self, predictions, targets, img_paths):
     super().update_metrics(predictions, targets)
 
-    predictions = predictions.max(dim=-1).item()
+    predictions = predictions.max(dim=-1)
+    # tolist moves data to CPU and creates a new python list
     maxarg = predictions.indices.tolist()
     maxval = predictions.values.tolist()
 
     self.predictions.extend(maxarg)
     self.scores.extend(maxval)
-    self.targets.extend(targets)
+    self.targets.extend(targets.tolist())
     self.img_paths.extend(img_paths)
   
   def compute_metrics(self):
@@ -141,18 +142,21 @@ class CheckpointManager():
         print(f"Loaded from epoch {checkpoint.get('epoch')} and step {checkpoint.get('batch_step')}")
 
     def latest_checkpoint(self):
+        if not os.path.isdir(self.folder):
+           return False
+        
         files = os.listdir(self.folder)
         files.sort(key=self._get_key)
 
         return files
 
-    def _get_key(file):
+    def _get_key(self, file):
         filename_parts = file.split("-")
 
         epoch = int(filename_parts[1]) if len(filename_parts) > 1 else 0
         batch = int(filename_parts[2].split(".")[0]) if len(filename_parts) > 2 else 0
 
-        return (-epoch, -batch)
+        return (epoch, batch)
 
 class DecoyRunner():
     def __init__(self) -> None:
