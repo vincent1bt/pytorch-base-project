@@ -9,6 +9,7 @@ from model.blocks import ResBlock, ResPoolBlock
 
 using_notebook = getattr(builtins, "__IPYTHON__", False)
 
+
 class ResBlockTests(TestCase):
     @classmethod
     def setUpClass(cls): # runs once before all the tests

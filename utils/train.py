@@ -190,7 +190,8 @@ class DebugTrainManager():
     with torch.no_grad():
       for inputs, targets, img_paths in self.val_loader:
         inputs, targets = inputs.to(self.device), targets.to(self.device)
-        predictions = self.model(inputs).softmax(dim=-1)
+        predictions = self.model(inputs)
+        predictions = predictions.softmax(dim=-1)
 
         self.metrics.update_metrics(predictions, targets, img_paths)
 

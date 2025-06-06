@@ -28,7 +28,7 @@ class data_config():
 
 @dataclass
 class train_config():
-  BATCH_SIZE: int = 8
+  BATCH_SIZE: int = 64
   LEARNING_RATE: float = 1.5e-3
   SHUFFLE: bool = True
   BETA1: float = 0.9

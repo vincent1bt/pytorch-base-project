@@ -44,6 +44,8 @@ class MetricsManager(torch.nn.Module):
       metric.update(predictions, targets)
 
   def compute_metrics(self):
+    # item returns a python scalar from a tensor
+    # moves tensor to cpu first if needed
     acc = self.accuracy.compute().item()
     prec = self.precision.compute().item()
     rec = self.recall.compute().item()
@@ -67,7 +69,7 @@ class DebugMetricsManager(MetricsManager):
     super().update_metrics(predictions, targets)
 
     predictions = predictions.max(dim=-1)
-    # tolist moves data to CPU and creates a new python list
+    # tolist moves data to CPU and returns a new python list
     maxarg = predictions.indices.tolist()
     maxval = predictions.values.tolist()
 

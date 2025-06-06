@@ -1,3 +1,8 @@
+import torch
+import pandas as pd
+import argparse
+import builtins
+
 from data.loader import ImageDataset, train_transforms, val_transforms
 from data.loader import label_mapping, text_mapping
 
@@ -6,16 +11,10 @@ from utils.train import create_optimizer, create_model, get_loss_function
 from utils.manage import CheckpointManager, DecoyLogger, MetricsManager
 from hparameters import data_config, model_config, train_config
 
-import torch
-from torch import nn
-import pandas as pd
-import argparse
-import builtins
-
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--epochs', type=int, default=50, help='Number of training epochs')
-parser.add_argument('--start_epoch', type=int, default=1, help='Initial epoch number')
+parser.add_argument('--start_epoch', type=int, default=0, help='Initial epoch number')
 parser.add_argument('--continue_training', default=False, action='store_true', help='Use training checkpoints to continue training the model')
 parser.add_argument('--use_wandb', default=False, action='store_true', help='Log the training using wandb')
 parser.add_argument('--wandb_id', type=str, default=False, help='id run for wandb')
@@ -87,13 +86,12 @@ val_loader = torch.utils.data.DataLoader(
 )
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device
+print(device)
 
 model = create_model(model_config)
 model = model.to(device)
 
 optimizer = create_optimizer(model, train_config)
-
 loss_fn = get_loss_function()
 
 train_metrics = MetricsManager()
@@ -133,7 +131,6 @@ test_manager = TestManager(
 if opts.continue_training:
   print("loading training checkpoints: ")
   latest_checkpoint = ckp_manager.latest_checkpoint()
-
   if latest_checkpoint:
     ckp_manager.load(latest_checkpoint[-1])
 
@@ -175,3 +172,6 @@ run.finish()
 
 torch.save(model.state_dict(), "model.pth")
 print("Model saved successfully!")
+
+# new test comment
+
