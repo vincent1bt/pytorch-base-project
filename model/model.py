@@ -26,36 +26,39 @@ class CNNet(nn.Module):
         )
     )
 
+    current_channels = initial_channels
+    current_feat_size = feat_size
+
     for _ in range(num_layers):
       self.model.append(
           ResBlock(
-              channels=initial_channels,
-              feat_size=feat_size
+              channels=current_channels,
+              out_feat_size=current_feat_size
           )
       )
 
-      feat_size = feat_size // 2
+      current_feat_size = current_feat_size // 2
 
       self.model.append(
           ResPoolBlock(
-              in_channels=initial_channels,
-              out_channels=initial_channels * 2,
-              feat_size=feat_size
+              in_channels=current_channels,
+              out_channels=current_channels * 2,
+              out_feat_size=current_feat_size
           )
       )
 
-      initial_channels = initial_channels * 2
+      current_channels = current_channels * 2
 
-    feat_size = feat_size // 2
+    current_feat_size = current_feat_size // 2
 
     self.model.append(
         nn.AdaptiveAvgPool2d(
-            (feat_size, feat_size)
+            (current_feat_size, current_feat_size)
         )
     )
 
     self.last_layer = nn.Linear(
-        in_features=feat_size * feat_size * initial_channels,
+        in_features=current_feat_size * current_feat_size * current_channels,
         out_features=data_config.NUM_CLASSES
     )
 

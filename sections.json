@@ -4,6 +4,7 @@
         "Model": "model/model",
         "Train": "train",
         "TrainUtils": "utils/train",
+        "TestUtils": "utils/test",
         "ManageUtils": "utils/manage",
         "HyperParameters": "hparameters",
         "DataLoader": "data/loader",

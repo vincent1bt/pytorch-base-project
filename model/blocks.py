@@ -2,7 +2,7 @@ from torch import nn
 from torch.nn import functional as F
 
 class ResBlock(nn.Module):
-    def __init__(self, channels, feat_size):
+    def __init__(self, channels, out_feat_size):
         super(ResBlock, self).__init__()
 
         self.block = nn.Sequential(
@@ -13,7 +13,7 @@ class ResBlock(nn.Module):
                 kernel_size=3,
                 stride=1,
             ),
-            nn.LayerNorm([channels, feat_size, feat_size]),
+            nn.LayerNorm([channels, out_feat_size, out_feat_size]),
             nn.SiLU(),
             nn.Conv2d(
                 in_channels=channels,
@@ -22,7 +22,7 @@ class ResBlock(nn.Module):
                 kernel_size=3,
                 stride=1
             ),
-            nn.LayerNorm([channels, feat_size, feat_size]),
+            nn.LayerNorm([channels, out_feat_size, out_feat_size]),
         )
 
     def forward(self, inputs):
@@ -31,9 +31,8 @@ class ResBlock(nn.Module):
 class ResPoolBlock(nn.Module):
     def __init__(
             self,
-            in_channels,
-            out_channels,
-            feat_size,
+            in_channels, out_channels,
+            out_feat_size,
         ):
         super(ResPoolBlock, self).__init__()
 
@@ -58,7 +57,7 @@ class ResPoolBlock(nn.Module):
                 stride=stride,
                 kernel_size=kernel_size
             ),
-            nn.LayerNorm([out_channels, feat_size, feat_size]),
+            nn.LayerNorm([out_channels, out_feat_size, out_feat_size]),
             nn.SiLU(),
             nn.Conv2d(
                 in_channels=out_channels,
@@ -67,7 +66,7 @@ class ResPoolBlock(nn.Module):
                 stride=1,
                 kernel_size=kernel_size,
             ),
-            nn.LayerNorm([out_channels, feat_size, feat_size]),
+            nn.LayerNorm([out_channels, out_feat_size, out_feat_size]),
         )
 
     def forward(self, inputs):

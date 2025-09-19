@@ -1,14 +1,15 @@
 import torch
-import pandas as pd
 import argparse
 import builtins
 
 from data.loader import ImageDataset, train_transforms, val_transforms
 from data.loader import label_mapping, text_mapping
+from data.dataset import obtain_dry_dataset, obtain_train_dataset
 
-from utils.train import StepTrainer, EpochTrainer, TestManager
+from utils.train import BatchTrainer, EpochTrainer, obtain_device
 from utils.train import create_optimizer, create_model, get_loss_function
-from utils.manage import CheckpointManager, DecoyLogger, MetricsManager
+from utils.test import TestManager, MetricsManager
+from utils.manage import CheckpointManager, DecoyLogger
 from hparameters import data_config, model_config, train_config
 
 parser = argparse.ArgumentParser()
@@ -17,11 +18,15 @@ parser.add_argument('--epochs', type=int, default=50, help='Number of training e
 parser.add_argument('--start_epoch', type=int, default=0, help='Initial epoch number')
 parser.add_argument('--continue_training', default=False, action='store_true', help='Use training checkpoints to continue training the model')
 parser.add_argument('--use_wandb', default=False, action='store_true', help='Log the training using wandb')
-parser.add_argument('--wandb_id', type=str, default=False, help='id run for wandb')
+parser.add_argument('--wandb_id', type=str, default='', help='id run for wandb')
+parser.add_argument('--dry_run', default=False, action='store_true', help='Run a dry test of the training')
 
 using_notebook = getattr(builtins, "__IPYTHON__", False)
 opts = parser.parse_args([]) if using_notebook else parser.parse_args()
 run_id = opts.wandb_id
+
+if opts.dry_run:
+  print('Running a dry train')
 
 num_workers = 2
 
@@ -43,20 +48,14 @@ finally:
 if using_notebook:
   opts.continue_training = True
 
-df = pd.read_csv(data_config.TRAIN_INFORMATION_FILE)
-
-train_set = df[df["is_valid"] == False]
-val_set = df[df["is_valid"] == True]
-
-train_img_paths = train_set["path"].values
-train_labels = train_set[data_config.NOISE_LEVEL].values
-
-val_img_paths = val_set["path"].values
-val_labels = val_set["noisy_labels_0"].values
+if opts.dry_run:
+  train_set, validation_set = obtain_dry_dataset()
+else:
+  train_set, validation_set = obtain_train_dataset()
 
 train_dataset = ImageDataset(
-    image_paths=train_img_paths,
-    image_labels=train_labels,
+    image_paths=train_set[0],
+    image_labels=train_set[1],
     folder_path=data_config.TRAIN_FOLDER_PATH,
     transforms=train_transforms,
 )
@@ -71,8 +70,8 @@ train_loader = torch.utils.data.DataLoader(
 )
 
 val_dataset = ImageDataset(
-    image_paths=val_img_paths,
-    image_labels=val_labels,
+    image_paths=validation_set[0],
+    image_labels=validation_set[1],
     folder_path=data_config.TRAIN_FOLDER_PATH,
     transforms=val_transforms,
 )
@@ -85,7 +84,7 @@ val_loader = torch.utils.data.DataLoader(
     # pin_memory=True,
 )
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = obtain_device()
 print(device)
 
 model = create_model(model_config)
@@ -94,13 +93,13 @@ model = model.to(device)
 optimizer = create_optimizer(model, train_config)
 loss_fn = get_loss_function()
 
-train_metrics = MetricsManager()
+train_metrics = MetricsManager(name="Training", num_classes=data_config.NUM_CLASSES)
 train_metrics.to(device)
 
-val_metrics = MetricsManager()
+val_metrics = MetricsManager(name="Validation", num_classes=data_config.NUM_CLASSES)
 val_metrics.to(device)
 
-step_trainer = StepTrainer(
+batch_trainer = BatchTrainer(
     model=model,
     optimizer=optimizer,
     loss_fn=loss_fn,
@@ -113,7 +112,7 @@ ckp_manager = CheckpointManager(
 
 epoch_trainer = EpochTrainer(
     train_loader=train_loader,
-    trainer=step_trainer,
+    batch_trainer=batch_trainer,
     device=device,
     wandb=wandb,
     ckp_manager=ckp_manager,
@@ -125,7 +124,7 @@ test_manager = TestManager(
     device=device,
     metrics=val_metrics,
     wandb=wandb,
-    val_loader=val_loader,
+    loader=val_loader,
 )
 
 if opts.continue_training:
@@ -159,7 +158,7 @@ run = wandb.init(project=train_config.PROJECT_NAME, tags=["train"], config=confi
 epochs = opts.epochs + opts.start_epoch
 
 for epoch in range(opts.start_epoch, epochs):
-    epoch_trainer.train(
+    epoch_trainer.step(
         epoch,
         epochs
     )
@@ -174,4 +173,3 @@ torch.save(model.state_dict(), "model.pth")
 print("Model saved successfully!")
 
 # new test comment
-

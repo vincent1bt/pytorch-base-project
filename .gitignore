@@ -9,3 +9,5 @@ training_checkpoints/
 pt_model.pt
 results.csv
 train_profile.py
+training_profile.py
+dry_run.py

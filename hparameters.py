@@ -17,8 +17,8 @@ labels = {
 
 @dataclass
 class data_config():
-  IMAGE_WIDTH: int = 224 # 256 for next training
-  IMAGE_HEIGHT: int = 224
+  IMAGE_WIDTH: int = 256
+  IMAGE_HEIGHT: int = 256
   IMAGE_CHANNELS: int = 3
   NUM_CLASSES: int = 10
   NOISE_LEVEL: str = "noisy_labels_5"
@@ -28,19 +28,19 @@ class data_config():
 
 @dataclass
 class train_config():
-  BATCH_SIZE: int = 64
-  LEARNING_RATE: float = 1.5e-3
+  BATCH_SIZE: int = 8
+  LEARNING_RATE: float = 3e-4
   SHUFFLE: bool = True
   BETA1: float = 0.9
   BETA2: float = 0.98
   EPSILON: float = 1e-6
-  WEIGHT_DECAY = 0.01
+  WEIGHT_DECAY = 0.0001
   PROJECT_NAME: str = "Base CNN Train"
 
 @dataclass
 class model_config():
   DROPOUT: float = 0.2
-  NUM_LAYERS: int = 5
+  NUM_LAYERS: int = 4
   INITIAL_CHANNELS: int = 16
   FEAT_SIZE: int = data_config.IMAGE_WIDTH
 

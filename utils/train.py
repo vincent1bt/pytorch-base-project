@@ -1,9 +1,9 @@
 import time
-from utils.manage import MeanLossMetric
+from utils.test import MeanLossMetric
 import torch
 from model.model import CNNet
 
-class StepTrainer():
+class BatchTrainer():
   def __init__(
       self,
       model,
@@ -14,7 +14,7 @@ class StepTrainer():
     self.optimizer = optimizer
     self.loss_fn = loss_fn
 
-  def train_step(self, inputs, targets):
+  def step(self, inputs, targets):
     predictions = self.model(inputs)
     loss = self.loss_fn(predictions, targets)
     self.optimizer.zero_grad()
@@ -27,16 +27,16 @@ class EpochTrainer():
   def __init__(
       self,
       train_loader,
-      trainer,
+      batch_trainer,
       device,
       wandb,
-      metrics=None,
+      metrics,
       ckp_manager=None,
     ):
     self.train_loader = train_loader
     self.wandb = wandb
 
-    self.trainer = trainer
+    self.batch_trainer = batch_trainer
     self.loss_metric = MeanLossMetric()
     self.metrics = metrics
 
@@ -45,50 +45,43 @@ class EpochTrainer():
 
     self.train_steps = len(train_loader)
   
-  def _print_metrics(
-      self, 
-      loss, 
-      rec, 
-      acc, 
-      prec,
-      end=''
+  def _log_info(
+      self,
+      loss, log_metrics
     ):
-    print(
-      '\r',
-      'Epoch', self.epoch_count, 
-      '| Step', f"{self.step}/{self.train_steps}",
-      '| Loss:', f"{loss:.5f}",
-      '| Recall:', f"{rec:.5f}",
-      '| Precision:', f"{prec:.5f}",
-      '| Accuracy:', f"{acc:.5f}",
-      '| Epoch Time:', f"{time.time() - self.epoch_time:.2f}" if end 
-      else '| Step Time:', f"{time.time() - self.batch_time:.2f}", 
-      end=end
-    )
 
-  def _train_step(
+    steps = f"{self.current_step}/{self.train_steps}"
+    batch_info = f"Epoch: {self.epoch_count}| Step: {steps}| Loss: {loss:.3f}| "
+    step_info = f"Step Time: {time.time() - self.batch_time:.2f}"
+
+    print('\r', f"{batch_info}{log_metrics}{step_info}", end=" ")
+
+  def _run_batch_step(
       self,
       inputs,
       targets,
     ):
     inputs, targets = inputs.to(self.device), targets.to(self.device)
-    predictions, loss = self.trainer.train_step(inputs, targets)
+    predictions, loss = self.batch_trainer.step(inputs, targets)
 
     self.metrics.update_metrics(predictions, targets)
 
-    rec, acc, prec = self.metrics.compute_metrics()
-
     self.loss_metric(loss)
     train_loss = self.loss_metric.mean
+    log_string = []
 
     self.wandb.log({"Loss": train_loss}, commit=False)
-    self.wandb.log({"Recall": rec}, commit=False)
-    self.wandb.log({"Precision": prec}, commit=False)
-    self.wandb.log({"Accuracy": acc}, commit=False)
-    self.wandb.log({"Step": self.step}, commit=False)
+
+    for name, metric in self.metrics.log_metrics:
+      metric_value = metric.item()
+      log_string.append(f"{name.split(' ')[1]}: {metric_value:.3f}| ")
+      self.wandb.log({f"{name}": metric_value}, commit=False)
+
+    self.wandb.log({"Step": self.current_step}, commit=False)
     self.wandb.log({"Epoch": self.epoch})
 
-    self._print_metrics(train_loss, rec, acc, prec)
+    log_metrics = "".join(log_string)
+    self._log_info(train_loss, log_metrics)
 
     if self.ckp_manager:
       self.ckp_manager.save(
@@ -96,79 +89,34 @@ class EpochTrainer():
         batch_step=0
       )
     
-    self.step += 1
+    self.current_step += 1
     self.batch_time = time.time()
 
-  def train(self, epoch, epochs):
-    self.trainer.model.train()
+  def step(self, current_epoch, total_epochs):
+    epoch_time = time.time()
+
+    self.batch_trainer.model.train()
     self.loss_metric.reset()
     self.metrics.reset_metrics()
-    self.epoch_time = time.time()
-
+    
     self.batch_time = time.time()
-    self.step = 1
-    self.epoch = epoch
+    self.current_step = 1
+    self.epoch = current_epoch
 
-    self.epoch_count = f"00{epoch}/{epochs}" if epoch < 99 else f"{epoch}/{epochs}"
+    self.epoch_count = f"00{current_epoch}/{total_epochs}"
+
+    if current_epoch > 99:
+      self.epoch_count = f"{current_epoch}/{total_epochs}"
 
     for inputs, targets, _ in self.train_loader:
-      self._train_step(
+      self._run_batch_step(
         inputs,
         targets,
       )
     
-    rec, acc, prec = self.metrics.compute_metrics()
-    self._print_metrics(self.loss_metric.mean, rec, acc, prec, end='\n')
+    print(f"Epoch Time: {time.time() - epoch_time:.2f}", end="\n")
 
-    return rec, acc, prec
-
-class TestManager():
-  def __init__(
-      self,
-      model,
-      device,
-      metrics,
-      wandb,
-      val_loader,
-    ):
-    self.wandb = wandb
-    self.model = model
-    self.device = device
-    self.metrics = metrics
-    self.val_loader = val_loader
-
-  def _print_metrics(
-      self, 
-      rec, 
-      acc, 
-      prec,
-    ):
-    print(
-      'Val Recall:', f"{rec:.5f}",
-      '| Val Precision:', f"{prec:.5f}",
-      '| Val Accuracy:', f"{acc:.5f}",
-    )
-
-  def test(self, epoch):
-    self.metrics.reset_metrics()
-    self.model.eval()
-
-    with torch.no_grad():
-      for inputs, targets, _ in self.val_loader:
-        inputs, targets = inputs.to(self.device), targets.to(self.device)
-        predictions = self.model(inputs).softmax(dim=-1)
-
-        self.metrics.update_metrics(predictions, targets)
-
-    rec, acc, prec = self.metrics.compute_metrics()
-    self._print_metrics(rec, acc, prec)
-
-    self.wandb.log({"Val Recall": rec}, commit=False)
-    self.wandb.log({"Val Precision": prec}, commit=False)
-    self.wandb.log({"Val Accuracy": acc}, commit=False)
-    self.wandb.log({"Val Epoch": epoch})
-
-    return rec, acc, prec
+    return self.metrics
 
 class DebugTrainManager():
   def __init__(
@@ -176,26 +124,38 @@ class DebugTrainManager():
       model,
       device,
       metrics,
-      val_loader,
+      loader,
     ):
     self.model = model
     self.device = device
     self.metrics = metrics
-    self.val_loader = val_loader
+    self.loader = loader
 
   def test(self):
     self.metrics.reset_metrics()
     self.model.eval()
 
     with torch.no_grad():
-      for inputs, targets, img_paths in self.val_loader:
+      for inputs, targets, img_paths in self.loader:
         inputs, targets = inputs.to(self.device), targets.to(self.device)
         predictions = self.model(inputs)
         predictions = predictions.softmax(dim=-1)
 
         self.metrics.update_metrics(predictions, targets, img_paths)
 
-    return self.metrics.compute_metrics()
+    return self.metrics
+
+def obtain_device():
+    device = "cpu"
+
+    if torch.cuda.is_available():
+        device = "cuda"
+    elif torch.mps.is_available():
+        device = "mps"
+
+    return torch.device(
+        device
+    )
 
 def create_model(config):
   return CNNet(
