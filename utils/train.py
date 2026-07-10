@@ -153,6 +153,8 @@ def obtain_device():
     elif torch.mps.is_available():
         device = "mps"
 
+    print(f"Deviced Used: {device}")
+
     return torch.device(
         device
     )

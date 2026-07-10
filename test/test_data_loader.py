@@ -100,7 +100,7 @@ class TestDataLoader(unittest.TestCase):
         )
       )
       self.assertEqual(
-        labels.shape,
+        labels.numel(),
         self.batch_size
       )
     except Exception as error:

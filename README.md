@@ -5,10 +5,10 @@ Blog post about good code practices to train PyTorch models related to this repo
 Commands to run testing:
 
 ```
-python -m unittest -v test/test_blocks.py
-python -m unittest -v test/test_model.py
-python -m unittest -v test/test_train.py
-python -m unittest -v test/test_data_loader.py
+make test-blocks
+make test-model
+make test-data-loader
+make test-train
 
 coverage run --omit='test/*' -m unittest discover test
 
@@ -19,6 +19,17 @@ python -m unittest discover test
 coverage report
 coverage html
 ```
+
+#### Other commands
+
+```
+uv pip compile pyproject.toml --no-deps -o requirements.txt
+```
+
+```
+
+```
+
 
 ## TO DO
 Share the library to translate code from Jupyter Notebooks to Files/folders.
