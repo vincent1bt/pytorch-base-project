@@ -1,0 +1,32 @@
+name: Test Pytorch Code
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+jobs:
+    Test-Workflow:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ['3.10']
+        steps:
+            - name: checkout
+              uses:  actions/checkout@v7
+            - name: install dependencies
+              run: |
+                make install
+            - name: Test Blocks
+              run: |
+                make test-blocks 
+            - name: Test Model
+              run: |
+                make test-model 
+            - name: Test Data Loader
+              run: |
+                make test-data-loader
+            - name: Test Train
+              run: |
+                make test-train 
