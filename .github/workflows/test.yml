@@ -8,7 +8,7 @@ on:
             - main
 env:
     SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
-    WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool'
+    WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
     IMAGE_NAME: 'torch-train'
     PROJECT_ID: companytesting-480806'
     REGION: 'us-central1'
