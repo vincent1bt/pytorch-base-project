@@ -40,6 +40,9 @@ jobs:
                 make test-train 
     build-and-push:
         runs-on: ubuntu-latest
+        permissions:
+          contents: 'read'
+          id-token: 'write'
         needs: test-workflow
         steps:
             - name: check out code
@@ -48,7 +51,6 @@ jobs:
               id: auth
               uses: google-github-actions/auth@v3
               with:
-                    token_format: 'access_token'
                     workload_identity_provider: ${{ env.WIF_PROVIDER }}
                     service_account: ${{ env.SERVICE_ACCOUNT }}
             
