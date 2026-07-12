@@ -10,7 +10,7 @@ env:
     SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
     WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
     IMAGE_NAME: 'torch-train'
-    PROJECT_ID: companytesting-480806'
+    PROJECT_ID: 'companytesting-480806'
     REGION: 'us-central1'
     ARTIFACT_REPO_NAME: 'train-dev-containers'
     DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
@@ -64,7 +64,7 @@ jobs:
             - name: build and push container
               uses: docker/build-push-action@v7.3.0
               with:
-                contex: .
+                context: .
                 push: true
                 tags: |
                     ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
