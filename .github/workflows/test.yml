@@ -38,7 +38,7 @@ jobs:
             - name: Submit to gcloud build
               run: |
                 gcloud builds submit train_component \
-                -- tag ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+                --tag ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
             
             - name: install python dependencies
               run: pip install google-cloud-aiplatform --break-system-packages
