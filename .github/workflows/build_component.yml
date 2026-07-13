@@ -1,20 +1,14 @@
-name: Test Pytorch Code
-on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+name: Build Vertex AI Components
+on: workflow_dispatch
+
 env:
     SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
     WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
-    IMAGE_NAME: 'torch-train'
+    IMAGE_NAME: 'clean-data'
     PROJECT_ID: 'companytesting-480806'
     REGION: 'us-central1'
-    ARTIFACT_REPO_NAME: 'train-dev-containers'
+    ARTIFACT_REPO_NAME: 'component-x-dev-containers'
     DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
-    GITHUB_SHA: ${{ github.sha }}
 jobs:
     build-and-push:
         runs-on: ubuntu-latest
@@ -32,15 +26,16 @@ jobs:
                     workload_identity_provider: ${{ env.WIF_PROVIDER }}
                     service_account: ${{ env.SERVICE_ACCOUNT }}
             
-            - name: set up gcloud
-              uses: google-github-actions/setup-gcloud@v3
-
-            - name: Submit to gcloud build
-              run: |
-                gcloud builds submit train_component \
-                -- tag ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            
-            - name: install python dependencies
-              run: pip install google-cloud-aiplatform --break-system-packages
-            - name: Trigger Vertex AI pipeline
-              run: python3 pipeline_runner.py
+            - name: docker login on artifact registry
+              uses: docker/login-action@v4.4.0
+              with:
+                registry: ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}
+                username: 'oauth2accesstoken'
+                password: ${{ steps.auth.outputs.access_token }}
+            - name: build and push container
+              uses: docker/build-push-action@v7.3.0
+              with:
+                context: ./train_component
+                push: true
+                tags: |
+                    ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
