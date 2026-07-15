@@ -1,8 +1,5 @@
 name: Test Pytorch Code
 on:
-    push:
-        branches:
-            - main
     pull_request:
         branches:
             - main
@@ -42,5 +39,16 @@ jobs:
             
             - name: install python dependencies
               run: pip install google-cloud-aiplatform --break-system-packages
+            - name: set status as pending
+              run: |
+                curl -X POST \
+                  -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                  -H "Accept: application/vnd.github+json" \
+                  https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+                  - d '{
+                    "state": "pending",
+                    "context": "vertex-test/pipeline-status",
+                    "description": "Wait for pipeline to finish"
+                  }'
             - name: Trigger Vertex AI pipeline
               run: python3 pipeline_runner.py
