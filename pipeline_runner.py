@@ -19,7 +19,7 @@ job = aiplatform.PipelineJob(
     display_name="pytorch test pipeline run",
     template_path=TEMPLATE_LOCATION,
     parameter_values={
-        "image_tag": GITHUB_SHA,
+        "commit_hash": GITHUB_SHA,
     },
 )
 
