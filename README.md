@@ -1,6 +1,6 @@
 ## Base Code to train Pytorch models. Including testing.
 
-Blog post about good code practices to train PyTorch models related to this repository available [here](https://vincentblog.link/posts/testing-and-workflow-to-train-pytorch-models)
+Blog post related to this repository  about good code practices to train PyTorch models available [here](https://vincentblog.link/posts/testing-and-workflow-to-train-pytorch-models)
 
 Commands to run testing:
 
@@ -25,11 +25,6 @@ coverage html
 ```
 uv pip compile pyproject.toml --no-deps -o requirements.txt
 ```
-
-```
-
-```
-
 
 ## TO DO
 Share the library to translate code from Jupyter Notebooks to Files/folders.
