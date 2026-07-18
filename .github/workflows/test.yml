@@ -36,10 +36,16 @@ jobs:
 
             - name: install python dependencies
               run: pip install google-cloud-aiplatform --break-system-packages
+            - name: Generate GitHub App Token
+              id: generate-token
+              uses: actions/create-github-app-token@v3
+              with:
+                  client-id: ${{ vars.CLIENT_ID }}
+                  private-key: ${{ secrets.PRIVATE_KEY }}
             - name: set status as pending
               run: |
                 curl -X POST \
-                  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                  -H "Authorization: Bearer ${{ steps.generate-token.outputs.token }}" \
                   -H "Accept: application/vnd.github+json" \
                   https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
                   -d '{
