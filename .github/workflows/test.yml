@@ -3,18 +3,18 @@ on:
     pull_request:
         branches:
             - main
-env:
-    SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
-    WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
-    IMAGE_NAME: 'torch-train'
-    PROJECT_ID: 'companytesting-480806'
-    REGION: 'us-central1'
-    ARTIFACT_REPO_NAME: 'train-dev-containers'
-    DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
-    GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
 jobs:
     build-and-push:
         runs-on: ubuntu-latest
+        env:
+          SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
+          WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
+          IMAGE_NAME: 'torch-train'
+          PROJECT_ID: 'companytesting-480806'
+          REGION: 'us-central1'
+          ARTIFACT_REPO_NAME: 'train-dev-containers'
+          DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
+          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
         permissions:
           contents: 'read'
           id-token: 'write'

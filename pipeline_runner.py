@@ -14,6 +14,7 @@ aiplatform.init(project=PROJECT_ID, location=LOCATION)
 logging.getLogger().setLevel(logging.INFO)
 
 logging.info(f"TEMPLATE USED: {TEMPLATE_LOCATION}")
+logging.info(f"SHA USED: {GITHUB_SHA}")
 
 job = aiplatform.PipelineJob(
     display_name="pytorch test pipeline run",
