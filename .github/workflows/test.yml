@@ -11,7 +11,7 @@ env:
     REGION: 'us-central1'
     ARTIFACT_REPO_NAME: 'train-dev-containers'
     DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
-    GITHUB_SHA: ${{ github.sha }}
+    GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
 jobs:
     build-and-push:
         runs-on: ubuntu-latest
@@ -47,7 +47,7 @@ jobs:
                 curl -X POST \
                   -H "Authorization: Bearer ${{ steps.generate-token.outputs.token }}" \
                   -H "Accept: application/vnd.github+json" \
-                  https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+                  https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha }} \
                   -d '{
                     "state": "pending",
                     "context": "vertex-test/pipeline-status",
