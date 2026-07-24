@@ -15,6 +15,7 @@ jobs:
           ARTIFACT_REPO_NAME: 'train-dev-containers'
           DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUM: ${{ github.event.pull_request.number }}
         permissions:
           contents: 'read'
           id-token: 'write'

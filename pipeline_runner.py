@@ -5,7 +5,9 @@ import logging
 PROJECT_ID = os.getenv('PROJECT_ID')
 LOCATION = os.getenv('REGION')
 RUNNER_SERVICE_ACCOUNT = os.getenv('SERVICE_ACCOUNT')
+
 PR_HEAD_SHA = os.getenv('PR_HEAD_SHA')
+PR_NUM = os.getenv('PR_NUM')
 
 TEMPLATE_LOCATION = f"https://us-central1-kfp.pkg.dev/{PROJECT_ID}/pipelines-repository/pytorch-test-pipeline/latest"
 
@@ -21,6 +23,7 @@ job = aiplatform.PipelineJob(
     template_path=TEMPLATE_LOCATION,
     parameter_values={
         "commit_hash": PR_HEAD_SHA,
+        "pull_number": PR_NUM
     },
 )
 
