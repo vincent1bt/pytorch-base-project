@@ -24,16 +24,21 @@ jobs:
             - name: check out code
               uses: actions/checkout@v7
             - name: Google Auth
-              id: auth
-              uses: google-github-actions/auth@v3
+              uses: ./.github/actions/auth
               with:
-                    token_format: 'access_token'
-                    workload_identity_provider: ${{ env.WIF_PROVIDER }}
+                    wif_provider: ${{ env.WIF_PROVIDER }}
                     service_account: ${{ env.SERVICE_ACCOUNT }}
-            
             - name: set up gcloud
               uses: google-github-actions/setup-gcloud@v3
-
+            - name: Build and push container
+              uses: ./.github/actions/build
+              with:
+                region: ${{ env.REGION }}
+                default_container_url: ${{ env.DEFAULT_CONTAINER_URL }}
+                project_id: ${{ env.PROJECT_ID }}
+                artifact_repo_name: ${{ env.ARTIFACT_REPO_NAME }}
+                image_name: ${{ env.IMAGE_NAME }}
+                pd_head_commit_sha:  ${{ env.PR_HEAD_SHA }}
             - name: install python dependencies
               run: pip install google-cloud-aiplatform --break-system-packages
             - name: Generate GitHub App Token
@@ -55,3 +60,5 @@ jobs:
                   }'
             - name: Trigger Vertex AI pipeline
               run: python3 pipeline_runner.py
+            - name: Echo sha commit
+              run: echo "PR_HEAD_SHA=${PR_HEAD_SHA}"

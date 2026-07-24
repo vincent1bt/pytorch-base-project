@@ -1,6 +1,5 @@
 name: Build Vertex AI Components
 on: workflow_dispatch
-
 env:
     SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
     WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
@@ -19,11 +18,10 @@ jobs:
             - name: check out code
               uses: actions/checkout@v7
             - name: Google Auth
-              id: auth
-              uses: google-github-actions/auth@v3
+              id: gcloud_auth
+              uses: ./.github/actions/auth
               with:
-                    token_format: 'access_token'
-                    workload_identity_provider: ${{ env.WIF_PROVIDER }}
+                    wif_provider: ${{ env.WIF_PROVIDER }}
                     service_account: ${{ env.SERVICE_ACCOUNT }}
             
             - name: docker login on artifact registry
@@ -31,7 +29,7 @@ jobs:
               with:
                 registry: ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}
                 username: 'oauth2accesstoken'
-                password: ${{ steps.auth.outputs.access_token }}
+                password: ${{ steps.gcloud_auth.outputs.access_token }}
             - name: build and push container
               uses: docker/build-push-action@v7.3.0
               with:

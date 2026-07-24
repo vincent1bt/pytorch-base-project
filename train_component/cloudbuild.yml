@@ -1,0 +1,12 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+  - 'build'
+  - '--build-arg=GIT_SHA=${GIT_SHA}'
+  - '-t'
+  - '$LOCATION-docker.pkg.dev/$PROJECT_ID/${REPOSITORY}/${IMAGE_NAME}:{GIT_SHA}'
+  - '.'
+images:
+- '$LOCATION-docker.pkg.dev/$PROJECT_ID/${REPOSITORY}/${IMAGE_NAME}:{GIT_SHA}'
+
+# LOCATION AND PROJECT_ID ARE DEFINED BY GCLOUD BUILD BY DEFAULT REMOVE {}

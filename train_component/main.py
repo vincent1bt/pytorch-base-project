@@ -5,6 +5,8 @@ import argparse
 logging.getLogger().setLevel(logging.INFO)
 logging.info("Main file Started")
 
+commit_sha = os.getenv('GIT_SHA')
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--output_data', type=str)
@@ -12,6 +14,8 @@ parser.add_argument('--output_data', type=str)
 args = parser.parse_args()
 
 logging.getLogger().setLevel(logging.INFO)
+
+logging.info(f"COMMIT SHA: {commit_sha}")
 
 logging.info(f"Output Dir: {args.output_data}")
 
