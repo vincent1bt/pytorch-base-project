@@ -25,5 +25,5 @@ runs:
     - name: run gcloud submit
       shell: bash
       run: |
-        gcloud builds submit train_component --config=cloudbuild.yaml \
+        gcloud builds submit train_component --config=train_component/cloudbuild.yaml \
         --substitutions=GIT_SHA=${{ inputs.pd_head_commit_sha }},REPOSITORY=${{ inputs.artifact_repo_name }},IMAGE_NAME=${{ inputs.image_name }}
