@@ -2,7 +2,7 @@
 
 Blog post related to this repository  about good code practices to train PyTorch models available [here](https://vincentblog.link/posts/testing-and-workflow-to-train-pytorch-models)
 
-Commands to run testing:
+Available Commands:
 
 ```
 make test-blocks

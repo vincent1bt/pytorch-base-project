@@ -3,18 +3,18 @@ on:
     pull_request:
         branches:
             - main
-env:
-    SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
-    WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
-    IMAGE_NAME: 'torch-train'
-    PROJECT_ID: 'companytesting-480806'
-    REGION: 'us-central1'
-    ARTIFACT_REPO_NAME: 'train-dev-containers'
-    DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
-    GITHUB_SHA: ${{ github.sha }}
 jobs:
     build-and-push:
         runs-on: ubuntu-latest
+        env:
+          SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
+          WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
+          IMAGE_NAME: 'torch-train'
+          PROJECT_ID: 'companytesting-480806'
+          REGION: 'us-central1'
+          ARTIFACT_REPO_NAME: 'train-dev-containers'
+          DEFAULT_CONTAINER_URL: 'docker.pkg.dev'
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         permissions:
           contents: 'read'
           id-token: 'write'
@@ -36,12 +36,18 @@ jobs:
 
             - name: install python dependencies
               run: pip install google-cloud-aiplatform --break-system-packages
+            - name: Generate GitHub App Token
+              id: generate-token
+              uses: actions/create-github-app-token@v3
+              with:
+                  client-id: ${{ vars.CLIENT_ID }}
+                  private-key: ${{ secrets.PRIVATE_KEY }}
             - name: set status as pending
               run: |
                 curl -X POST \
-                  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                  -H "Authorization: Bearer ${{ steps.generate-token.outputs.token }}" \
                   -H "Accept: application/vnd.github+json" \
-                  https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }} \
+                  https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha }} \
                   -d '{
                     "state": "pending",
                     "context": "vertex-test/pipeline-status",
