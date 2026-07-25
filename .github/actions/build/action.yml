@@ -26,4 +26,4 @@ runs:
       shell: bash
       run: |
         gcloud builds submit train_component --config=train_component/cloudbuild.yml \
-        --substitutions=GIT_SHA=${{ inputs.pd_head_commit_sha }},REPOSITORY=${{ inputs.artifact_repo_name }},IMAGE_NAME=${{ inputs.image_name }},REGION=${{ inputs.region }}
+        --substitutions=_GIT_SHA=${{ inputs.pd_head_commit_sha }},_REPOSITORY=${{ inputs.artifact_repo_name }},_IMAGE_NAME=${{ inputs.image_name }},_REGION=${{ inputs.region }}

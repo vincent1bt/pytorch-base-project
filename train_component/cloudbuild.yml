@@ -2,11 +2,11 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: 
   - 'build'
-  - '--build-arg=GIT_SHA=${GIT_SHA}'
+  - '--build-arg=GIT_SHA=${_GIT_SHA}'
   - '-t'
-  - '${REGION}-docker.pkg.dev/$PROJECT_ID/${REPOSITORY}/${IMAGE_NAME}:${GIT_SHA}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:${_GIT_SHA}'
   - '.'
 images:
-- '${REGION}-docker.pkg.dev/$PROJECT_ID/${REPOSITORY}/${IMAGE_NAME}:${GIT_SHA}'
+- '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:${_GIT_SHA}'
 
 # LOCATION AND PROJECT_ID ARE DEFINED BY GCLOUD BUILD BY DEFAULT REMOVE {}
