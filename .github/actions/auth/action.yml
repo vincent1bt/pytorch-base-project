@@ -1,0 +1,23 @@
+name: Google Auth Action
+description: Auths GCloud 
+inputs:
+  service_account:
+      description: 'The service account'
+      required: true
+  wif_provider:
+    description: "WIF provider"
+    required: true
+outputs:
+  access_token:
+    description: "Access token from gcloud auth"
+    value: ${{ steps.auth.outputs.access_token }}
+runs:
+  using: composite # executes in the same env as workflow
+  steps:
+  - name: login using auth
+    id: auth
+    uses: google-github-actions/auth@v3
+    with:
+        token_format: 'access_token'
+        workload_identity_provider: ${{  inputs.wif_provider }}
+        service_account: ${{  inputs.service_account }}

@@ -5,15 +5,24 @@ import argparse
 logging.getLogger().setLevel(logging.INFO)
 logging.info("Main file Started")
 
+commit_sha = os.getenv('GIT_SHA') # raise error instead
+
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--output_data', type=str)
+parser.add_argument('--container_commit_sha', type=str)
 
 args = parser.parse_args()
 
 logging.getLogger().setLevel(logging.INFO)
 
-logging.info(f"Output Dir: {args.output_data}")
+logging.info(f"COMMIT SHA: {commit_sha}")
+
+logging.info(f"Output Dir: {args.container_commit_sha}")
+
+os.makedirs(os.path.dirname(args.container_commit_sha), exist_ok=True)
+
+with open(args.container_commit_sha, "w") as f:
+    f.write(commit_sha)
 
 logging.info("Drift detected", extra={
     "json_fields": {

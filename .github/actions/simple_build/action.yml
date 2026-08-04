@@ -1,0 +1,29 @@
+name: Submit to gcloud build
+description: Builds container uisng gcloud
+inputs:
+  region:
+    description: 'region'
+    required: true
+  default_container_url:
+    description: "Container URL"
+    required: true
+  project_id:
+    description: "project id"
+    required: true
+  artifact_repo_name:
+    description: "artifact repo name"
+    required: true
+  image_name:
+    description: "Image name"
+    required: true
+  pd_head_commit_sha:
+    description: "Commit sha"
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: run gcloud submit
+      shell: bash
+      run: |
+        gcloud builds submit train_component \
+        --tag ${{ inputs.region }}-${{ inputs.default_container_url }}/${{ inputs.project_id }}/${{ inputs.artifact_repo_name }}/${{ inputs.image_name }}:${{ inputs.pd_head_commit_sha }}
