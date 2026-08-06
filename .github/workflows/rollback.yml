@@ -5,6 +5,9 @@ on:
       target_sha:
         description: 'Commit SHA to roll back to'
         required: true
+permissions:
+    contents: 'read'
+    id-token: 'write'
 env:
     SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
     WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
@@ -26,7 +29,7 @@ jobs:
                 wif_provider: ${{ env.WIF_PROVIDER }}
             - name: set up gcloud
               uses: google-github-actions/setup-gcloud@v3
-            - name: add-tag
+            - name: revert tag
               run: |
                gcloud artifacts docker tags add \
                 ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.target_sha }} \
