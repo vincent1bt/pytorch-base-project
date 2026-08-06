@@ -12,7 +12,7 @@ make test-train
 
 coverage run --omit='test/*' -m unittest discover test
 
-notebookreader
+notebookreader library
 
 python -m unittest discover test
 
