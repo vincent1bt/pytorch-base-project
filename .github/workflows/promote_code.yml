@@ -3,6 +3,9 @@ on:
     pull_request:
         branches: [main]
         types: [closed] 
+permissions:
+    contents: 'read'
+    id-token: 'write'
 env:
     SERVICE_ACCOUNT: 'vertexai-runner@companytesting-480806.iam.gserviceaccount.com'
     WIF_PROVIDER: 'projects/558007337566/locations/global/workloadIdentityPools/github-pool/providers/my-repo'
@@ -26,7 +29,7 @@ jobs:
                 wif_provider: ${{ env.WIF_PROVIDER }}
             - name: set up gcloud
               uses: google-github-actions/setup-gcloud@v3
-            - name: add-tag
+            - name: add latest tag
               run: |
                gcloud artifacts docker tags add \
                 ${{ env.REGION }}-${{ env.DEFAULT_CONTAINER_URL }}/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ env.PR_HEAD_SHA }} \
